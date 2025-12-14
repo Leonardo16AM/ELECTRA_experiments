@@ -24,7 +24,7 @@ def set_seed(seed):
         torch.cuda.manual_seed_all(seed)
 
 set_seed(42)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class ElectraGenerator(nn.Module):
     def __init__(self, config, embedding_size):
@@ -77,11 +77,11 @@ class SimpleELECTRA(nn.Module):
 
         masked_input_ids = input_ids.clone()
         
-        indices_replaced = torch.bernoulli(torch.full(input_ids.shape, 0.8)).bool().to(device) & masked_indices
+        indices_replaced = torch.bernoulli(torch.full(input_ids.shape, 0.8)).bool().to(DEVICE) & masked_indices
         masked_input_ids[indices_replaced] = 103
 
-        indices_random = torch.bernoulli(torch.full(input_ids.shape, 0.5)).bool().to(device) & masked_indices & ~indices_replaced
-        random_words = torch.randint(VOCAB_SIZE, input_ids.shape, dtype=torch.long).to(device)
+        indices_random = torch.bernoulli(torch.full(input_ids.shape, 0.5)).bool().to(DEVICE) & masked_indices & ~indices_replaced
+        random_words = torch.randint(VOCAB_SIZE, input_ids.shape, dtype=torch.long).to(DEVICE)
         masked_input_ids[indices_random] = random_words[indices_random]
 
         shared_embeddings = self.discriminator.embeddings(masked_input_ids)
@@ -124,6 +124,6 @@ class SimpleELECTRA(nn.Module):
     @classmethod
     def load_checkpoint(cls, path, disc_hidden=256, gen_hidden=64, device='cpu'):
         model = cls(disc_hidden_size=disc_hidden, gen_hidden_size=gen_hidden)
-        model.load_state_dict(torch.load(path, map_location=device))
-        model.to(device)
+        model.load_state_dict(torch.load(path, map_location=DEVICE))
+        model.to(DEVICE)
         return model

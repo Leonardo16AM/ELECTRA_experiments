@@ -23,7 +23,7 @@ def get_dataloader():
     def encode(examples):
         return tokenizer(examples["text"], truncation=True, padding="max_length", max_length=SEQ_LEN)
 
-    dataset = dataset.filter(lambda x: len(x["text"]) > 10) # Filter empty lines
+    dataset = dataset.filter(lambda x: len(x["text"])>10) 
     encoded_dataset = dataset.map(encode, batched=True)
     encoded_dataset.set_format(type="torch", columns=["input_ids", "attention_mask"])
     
@@ -61,6 +61,14 @@ def train_experiment(gen_hidden_size, dataloader):
     model.save_checkpoint(f"models/electra_gen{gen_hidden_size}_disc256.pth")
     return disc_losses
 
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
     train_loader = get_dataloader()
     
@@ -82,7 +90,6 @@ if __name__ == "__main__":
     plt.legend()
     plt.grid(True, alpha=0.3)
     
-    output_file = "electra_experiment_1_en.png"
+    output_file = "imgs/electra_experiment_1_en.png"
     plt.savefig(output_file)
-    print(f"\nExperiment completed! Graph saved to '{output_file}'")
     plt.show()
